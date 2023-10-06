@@ -1,5 +1,6 @@
 use type_layout::TypeLayout;
-
+use std::ffi::{c_char, c_void, CStr, CString};
+use std::mem::{forget, ManuallyDrop, MaybeUninit};
 
 // This is a comment, and is ignored by the compiler.
 // You can test this code by clicking the "Run" button over there ->
@@ -44,4 +45,28 @@ pub struct YInput {
     ///
     /// For other types it's always equal to `1`.
     pub len: u32,
+
+    /// Union struct which contains a content corresponding to a provided `tag` field.
+    value: YInputContent,
+}
+
+pub struct Doc { 
+}
+
+#[repr(C)]
+union YInputContent {
+    flag: u8,
+    num: f64,
+    integer: i64,
+    str: *mut c_char,
+    buf: *mut c_char,
+    values: *mut YInput,
+    map: ManuallyDrop<YMapInputData>,
+    doc: *mut Doc,
+}
+
+#[repr(C)]
+struct YMapInputData {
+    keys: *mut *mut c_char,
+    values: *mut YInput,
 }
