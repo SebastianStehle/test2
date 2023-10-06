@@ -13,6 +13,18 @@ use std::mem::{forget, ManuallyDrop, MaybeUninit};
 // This is the main function.
 fn main() {
   // Statements here are executed when the compiled binary is called.
+  
+  let a: i8 = -8;
+  let b: i8 = -2;
+  let c: i8 = 0;
+  let d: i8 = 2;
+  let e: i8 = 8;
+
+  println!("{:08b}", a);
+  println!("{:08b}", b);
+  println!("{:08b}", c);
+  println!("{:08b}", d);
+  println!("{:08b}", e);
 
   println!("{}", YInput::type_layout());
 }
