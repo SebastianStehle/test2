@@ -101,6 +101,12 @@ jobs:
           rustup target add ${{ matrix.target }}
           rustup show
         
+      - name: Build (cargo)
+        if: "!matrix.cross"
+        run: |
+          RUSTFLAGS="-C target-feature=-crt-static" cargo run --release --target ${{ matrix.target }}
+        shell: bash
+        
       - name: Build (cross)
         if: matrix.cross
         run: |
