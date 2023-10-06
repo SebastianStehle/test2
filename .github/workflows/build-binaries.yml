@@ -1,9 +1,6 @@
 name: Build Binaries
 
-on:
-  push:
-    tags: 
-      - 'binaries[0-9]'
+on: [push, pull_request]
   
 jobs:
   # Based on https://www.rohanjain.in/cargo-cross/
