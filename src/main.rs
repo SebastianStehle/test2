@@ -12,21 +12,8 @@ use std::mem::{forget, ManuallyDrop, MaybeUninit};
 
 // This is the main function.
 fn main() {
-  // Statements here are executed when the compiled binary is called.
-  
-  let a: i8 = -8;
-  let b: i8 = -2;
-  let c: i8 = 0;
-  let d: i8 = 2;
-  let e: i8 = 8;
-
-  println!("{:08b}", a);
-  println!("{:08b}", b);
-  println!("{:08b}", c);
-  println!("{:08b}", d);
-  println!("{:08b}", e);
-
-  println!("{}", YInput::type_layout());
+  println!("{}", YAfterTransactionEvent::type_layout());
+  println!("{}", YStateVector::type_layout());
 }
 
 #[derive(TypeLayout)]
@@ -77,8 +64,49 @@ union YInputContent {
     doc: *mut Doc,
 }
 
+#[derive(TypeLayout)]
 #[repr(C)]
 struct YMapInputData {
     keys: *mut *mut c_char,
     values: *mut YInput,
+}
+
+#[derive(TypeLayout)]
+#[repr(C)]
+pub struct YAfterTransactionEvent {
+    /// Descriptor of a document state at the moment of creating the transaction.
+    pub before_state: YStateVector,
+    /// Descriptor of a document state at the moment of committing the transaction.
+    pub after_state: YStateVector,
+    /// Information about all items deleted within the scope of a transaction.
+    pub delete_set: YDeleteSet,
+}
+
+#[derive(TypeLayout)]
+#[repr(C)]
+pub struct YStateVector {
+    /// Number of clients. It describes a length of both `client_ids` and `clocks` arrays.
+    pub entries_count: u32,
+    /// Array of unique client identifiers (length is given in `entries_count` field). Each client
+    /// ID has corresponding clock attached, which can be found in `clocks` field under the same
+    /// index.
+    pub client_ids: *mut u64,
+    /// Array of clocks (length is given in `entries_count` field) known for each client. Each clock
+    /// has a corresponding client identifier attached, which can be found in `client_ids` field
+    /// under the same index.
+    pub clocks: *mut u32,
+}
+
+#[repr(C)]
+pub struct YDeleteSet {
+    /// Number of client identifier entries.
+    pub entries_count: u32,
+    /// Array of unique client identifiers (length is given in `entries_count` field). Each client
+    /// ID has corresponding sequence of ranges attached, which can be found in `ranges` field under
+    /// the same index.
+    pub client_ids: *mut u64,
+    /// Array of range sequences (length is given in `entries_count` field). Each sequence has
+    /// a corresponding client ID attached, which can be found in `client_ids` field under
+    /// the same index.
+    pub ranges: *mut u64,
 }
